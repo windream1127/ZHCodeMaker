@@ -1,5 +1,6 @@
 #import "ZHStoryboardTextManager.h"
 #import "ZHStroyBoardFileManager.h"
+#import "ZHNSString.h"
 
 static NSMutableDictionary *ZHStoryboardDicM;
 static NSMutableDictionary *ZHStoryboardIDDicM;
@@ -110,6 +111,46 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
     NSArray *arr=[text componentsSeparatedByString:@"\n"];
     NSMutableArray *arrM=[NSMutableArray array];
     NSString *rowStr,*newRowStr,*viewIdenity;
+    
+    NSMutableDictionary *conectionDic = [NSMutableDictionary new];
+    // 保存一下 IBAction 的连接
+    // property="VRImageView" destination="yFw-Yh-1qk"
+    
+    // 获取 fd_collapsibleConstraints
+    NSMutableArray *FDDic = [NSMutableArray new];
+    for (NSInteger i=0; i<arr.count; i++) {
+        rowStr=arr[i];
+        NSString * text=[ZHNSString removeSpaceBeforeAndAfterWithString:rowStr];
+        if ([text hasPrefix:@"<outlet"]) {
+            // 是连线
+            if (([rowStr rangeOfString:@"property=\""].location!=NSNotFound)&& ([rowStr rangeOfString:@"destination=\""].location!=NSNotFound)) {
+                // proerty: VRImageView
+                NSString *property=[rowStr substringFromIndex:[rowStr rangeOfString:@"property=\""].location+10];
+                property=[property substringToIndex:[property rangeOfString:@"\""].location];
+                
+                // destination: yFw-Yh-1qk 对应 xib 上具体的控件 id
+                NSString *destination=[rowStr substringFromIndex:[rowStr rangeOfString:@"destination=\""].location+13];
+                destination=[destination substringToIndex:[destination rangeOfString:@"\""].location];
+                [conectionDic setValue:property forKey:destination];
+            }
+        }
+        
+        if ([text hasPrefix:@"<outletCollection"]) {
+            
+            if (([rowStr rangeOfString:@"property=\""].location!=NSNotFound)&& ([rowStr rangeOfString:@"destination=\""].location!=NSNotFound)) {
+                
+                NSString *property=[rowStr substringFromIndex:[rowStr rangeOfString:@"property=\""].location+10];
+                property=[property substringToIndex:[property rangeOfString:@"\""].location];
+                
+                if ([property isEqualToString:@"fd_collapsibleConstraints"]) {
+                    NSString *destination=[rowStr substringFromIndex:[rowStr rangeOfString:@"destination=\""].location+13];
+                    destination=[destination substringToIndex:[destination rangeOfString:@"\""].location];
+                    [FDDic addObject:destination];
+                }
+            }
+        }
+    }
+    
     for (NSInteger i=0; i<arr.count; i++) {
         rowStr=arr[i];
         
@@ -124,6 +165,11 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                     NSString *idStr=[rowStr substringFromIndex:[rowStr rangeOfString:@"id=\""].location+4];
                     idStr=[idStr substringToIndex:[idStr rangeOfString:@"\""].location];
                     NSString *viewCountIdenity=[self getViewCountIdenityWithViewIdenity:@"<self.view "];
+                    
+                    if ([conectionDic containsObjectForKey:idStr]) {
+                        viewCountIdenity = [conectionDic objectForKey:idStr];
+                    }
+                    
                     [[self defaultIDDicM]setValue:idStr forKey:viewCountIdenity];
                 }
                 [arrM addObject:[self replaceAllIdByCustomClass:rowStr]];
@@ -131,21 +177,27 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
             }
             
             //如果这一行里面没有标识符CustomClass
-            if ([rowStr rangeOfString:@" customClass"].location==NSNotFound) {
+            if ([rowStr rangeOfString:@" userLabel"].location==NSNotFound) {
                 
                 if ([rowStr hasSuffix:@">"]==YES) {
                     newRowStr=[rowStr substringToIndex:rowStr.length-1];
                     NSString *viewCountIdenity=[self getViewCountIdenityWithViewIdenity:viewIdenity];
-                    newRowStr=[newRowStr stringByAppendingFormat:@" customClass=\"%@\">",viewCountIdenity];
                     
-                    if ([newRowStr rangeOfString:@" customClass=\""].location!=NSNotFound&&[newRowStr rangeOfString:@" id=\""].location!=NSNotFound) {
-                        NSString *customClass=[newRowStr substringFromIndex:[newRowStr rangeOfString:@"customClass=\""].location+13];
+                    NSString *idStr=[newRowStr substringFromIndex:[newRowStr rangeOfString:@"id=\""].location+4];
+                    idStr=[idStr substringToIndex:[idStr rangeOfString:@"\""].location];
+                    
+                    if ([conectionDic containsObjectForKey:idStr]) {
+                        viewCountIdenity = [conectionDic objectForKey:idStr];
+                    }
+                    
+                    newRowStr=[newRowStr stringByAppendingFormat:@" userLabel=\"%@\">",viewCountIdenity];
+                    
+                    
+                    if ([newRowStr rangeOfString:@" userLabel=\""].location!=NSNotFound&&[newRowStr rangeOfString:@" id=\""].location!=NSNotFound) {
+                        NSString *customClass=[newRowStr substringFromIndex:[newRowStr rangeOfString:@"userLabel=\""].location+11];
                         customClass=[customClass substringToIndex:[customClass rangeOfString:@"\""].location];
                         //                        NSLog(@"customClass=%@",customClass);
                         
-                        NSString *idStr=[newRowStr substringFromIndex:[newRowStr rangeOfString:@"id=\""].location+4];
-                        idStr=[idStr substringToIndex:[idStr rangeOfString:@"\""].location];
-                        //                        NSLog(@"idStr=%@",idStr);
                         
                         [[self defaultIDDicM]setValue:idStr forKey:customClass];
                         
@@ -156,8 +208,8 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                     [arrM addObject:[self replaceAllIdByCustomClass:newRowStr]];
                     continue;
                 }
-            }else if ([rowStr rangeOfString:@" customClass=\""].location!=NSNotFound&&[rowStr rangeOfString:@" id=\""].location!=NSNotFound) {
-                NSString *customClass=[rowStr substringFromIndex:[rowStr rangeOfString:@"customClass=\""].location+13];
+            }else if ([rowStr rangeOfString:@" userLabel=\""].location!=NSNotFound&&[rowStr rangeOfString:@" id=\""].location!=NSNotFound) {
+                NSString *customClass=[rowStr substringFromIndex:[rowStr rangeOfString:@"userLabel=\""].location+11];
                 customClass=[customClass substringToIndex:[customClass rangeOfString:@"\""].location];
                 NSString *newCustomClass;
                 if (needDealAdapterCell) {
@@ -167,8 +219,8 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                 }
                 if (newCustomClass.length>0) {
                     //替换
-                    NSString *oldCustom=[@" customClass=\"" stringByAppendingString:customClass];
-                    NSString *newCustom=[@" customClass=\"" stringByAppendingString:newCustomClass];
+                    NSString *oldCustom=[@" userLabel=\"" stringByAppendingString:customClass];
+                    NSString *newCustom=[@" userLabel=\"" stringByAppendingString:newCustomClass];
                     rowStr=[rowStr stringByReplacingOccurrencesOfString:oldCustom withString:newCustom];
                     customClass=newCustomClass;
                 }
@@ -178,6 +230,9 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                 NSString *idStr=[rowStr substringFromIndex:[rowStr rangeOfString:@"id=\""].location+4];
                 idStr=[idStr substringToIndex:[idStr rangeOfString:@"\""].location];
                 //                                NSLog(@"idStr=%@",idStr);
+                if ([conectionDic containsObjectForKey:idStr]) {
+                    customClass = [conectionDic objectForKey:idStr];
+                }
                 
                 [[self defaultIDDicM]setValue:idStr forKey:customClass];
             }else{
@@ -192,18 +247,28 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                 [[self defaultIDDicM] removeAllObjects];
                 
                 //如果没有打上标识符
-                if([tempStr rangeOfString:@" customClass=\""].location==NSNotFound){
+                if([tempStr rangeOfString:@" userLabel=\""].location==NSNotFound){
                     
                     if ([tempStr hasSuffix:@"sceneMemberID=\"viewController\">"]) {
                         NSString *newRowStr=[rowStr stringByReplacingOccurrencesOfString:@"sceneMemberID=\"viewController\">" withString:@""];
                         NSString *viewCountIdenity=[self getViewCountIdenityWithViewIdenity:@"<viewController "];
-                        newRowStr=[newRowStr stringByAppendingString:[NSString stringWithFormat:@"customClass=\"%@\"",viewCountIdenity]];
+                        NSString *idStr=[newRowStr substringFromIndex:[newRowStr rangeOfString:@"id=\""].location+4];
+                        idStr=[idStr substringToIndex:[idStr rangeOfString:@"\""].location];
+                        if ([conectionDic containsObjectForKey:idStr]) {
+                            viewCountIdenity = [conectionDic objectForKey:idStr];
+                        }
+                        
+                        newRowStr=[newRowStr stringByAppendingString:[NSString stringWithFormat:@"userLabel=\"%@\"",viewCountIdenity]];
                         newRowStr=[newRowStr stringByAppendingString:@" sceneMemberID=\"viewController\">"];
                         [arrM addObject:[self replaceAllIdByCustomClass:newRowStr]];
                         continue;
                     }
                 }
             }
+        }
+        // 处理 fd_collapsibleConstraints
+        for (NSString *fd_collapsibleConstraintsId in FDDic) {
+            rowStr=[rowStr stringByReplacingOccurrencesOfString:fd_collapsibleConstraintsId withString:[NSString stringWithFormat:@"fd_collapsibleConstraintsId\" isFD=\"1"]];
         }
         [arrM addObject:[self replaceAllIdByCustomClass:rowStr]];
     }
@@ -290,10 +355,11 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
         }
     }
     
-    //第一个字母大写
-    viewCategory=[self upFirstCharacter:viewCategory];
-    
-    return [NSString stringWithFormat:@"@property (strong, nonatomic) UI%@ *%@;",viewCategory,viewName];
+//    //第一个字母大写
+//    viewCategory=[self upFirstCharacter:viewCategory];
+    BOOL hasUiPrefix = [viewCategory hasPrefix:@"UI"];
+    NSString *watching = hasUiPrefix?@"":@" // 注意添加头文件";
+    return [NSString stringWithFormat:@"@property (strong, nonatomic) %@ *%@;%@",viewCategory,viewName,watching];
 }
 
 /**替换所有的约束的.constant=;*/
@@ -495,6 +561,23 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
     return [NSString stringWithFormat:@"@property (strong, nonatomic) UI%@ *%@;",[self upFirstCharacter:viewCategoryName],view];
 }
 
+
+/**
+ addSubview
+
+ @param viewName 子属视图
+ @param fatherView 父视图
+ @return 添加代码
+ */
++ (NSString *)getAddSubviewWithViewName:(NSString *)viewName addToFatherView:(NSString *)fatherView{
+    NSString *addString = @"";
+    
+    BOOL hasSelf = [fatherView hasPrefix:@"self."];
+    NSString *prefix = hasSelf?@"":@"self.";
+    addString = [NSString stringWithFormat:@"[%@%@ addSubview:self.%@];\n\n",prefix,fatherView,viewName];
+    
+    return addString;
+}
 /**获取创建某个view的代码*/
 + (NSString *)getCreateViewCodeWithIdStr:(NSString *)idStr WithViewName:(NSString *)viewName withViewCategoryName:(NSString *)viewCategoryName withOutletView:(NSDictionary *)outletView addToFatherView:(NSString *)fatherView withDoneArrM:(NSMutableArray *)doneArrM isOnlyTableViewOrCollectionView:(BOOL)isOnlyTableViewOrCollectionView withIdAndOutletViewsDic:(NSDictionary *)idAndOutletViews{
     
@@ -635,6 +718,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                         if ([secondItem hasPrefix:@"self."]) {
                             if(constant.length>0){
                                 if ([firstAttribute isEqualToString:@"trailing"]||[firstAttribute isEqualToString:@"bottom"]) {
+//                                    relation = [self checkRelation:relation reverse:YES];
                                     constant=[@"-" stringByAppendingString:constant];
                                 }
                                 [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@).with.offset(%@)",firstAttribute,secondItem,firstAttribute,constant];
@@ -644,6 +728,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                         }else{
                             if(constant.length>0){
                                 if (([firstAttribute isEqualToString:@"trailing"]||[firstAttribute isEqualToString:@"bottom"])&&[firstAttribute isEqualToString:secondAttribute]) {
+//                                    relation = [self checkRelation:relation reverse:YES];
                                     constant=[@"-" stringByAppendingString:constant];
                                 }
                                 [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@).with.offset(%@)",firstAttribute,secondItem,secondAttribute,constant];
@@ -673,6 +758,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                         if ([firstItem hasPrefix:@"self."]) {
                             if(constant.length>0){
                                 if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+//                                    relation = [self checkRelation:relation reverse:YES];
                                     constant=[@"-" stringByAppendingString:constant];
                                 }
                                 [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@).with.offset(%@)",secondAttribute,firstItem,secondAttribute,constant];
@@ -682,6 +768,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                         }else{
                             if(constant.length>0){
                                 if (([firstAttribute isEqualToString:@"trailing"]||[firstAttribute isEqualToString:@"bottom"])&&[firstAttribute isEqualToString:secondAttribute]) {
+//                                    relation = [self checkRelation:relation reverse:YES];
                                     constant=[@"-" stringByAppendingString:constant];
                                 }
                                 [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@).with.offset(%@)",secondAttribute,firstItem,firstAttribute,constant];
@@ -712,6 +799,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                             }
                             if(constant.length>0){
                                 if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+//                                    relation = [self checkRelation:relation reverse:YES];
                                     constant=[@"-" stringByAppendingString:constant];
                                 }
                                 [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@).with.offset(%@)",secondAttribute,firstItem,firstAttribute,constant];
@@ -732,6 +820,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                             }
                             if(constant.length>0){
                                 if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+//                                    relation = [self checkRelation:relation reverse:YES];
                                     constant=[@"-" stringByAppendingString:constant];
                                 }
                                 [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@).with.offset(%@)",secondAttribute,firstItem,secondAttribute,constant];
@@ -753,6 +842,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                         }
                         if(constant.length>0){
                             if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+//                                relation = [self checkRelation:relation reverse:YES];
                                 constant=[@"-" stringByAppendingString:constant];
                             }
                             [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@).with.offset(%@)",secondAttribute,firstItem,secondAttribute,constant];
@@ -879,7 +969,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
     [viewsArr addObject:@"<tableViewCell "];
     [viewsArr addObject:@"<collectionViewCell "];
     
-    NSString *customClass=[rowStr substringFromIndex:[rowStr rangeOfString:@"customClass=\""].location+13];
+    NSString *customClass=[rowStr substringFromIndex:[rowStr rangeOfString:@"userLabel=\""].location+11];
     customClass=[customClass substringToIndex:[customClass rangeOfString:@"\""].location];
     
     customClass=[ZHStroyBoardFileManager getAdapterCollectionViewCellAndTableViewCellName:customClass];
@@ -1846,5 +1936,334 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
         //开始插入
         [self addCodeText:strM andInsertType:ZHAddCodeType_end_last toStrM:text insertFunction:nil];
     }
+}
+
++ (NSString *)checkRelation:(NSString *)relation reverse:(BOOL)reverse
+{
+    NSString *relationStr = @"";
+    if ([relation isEqualToString:@"greaterThanOrEqual"]) {
+        relationStr = @"greaterThanOrEqualTo";
+        if (reverse) {
+            relationStr = @"lessThanOrEqualTo";
+        }
+    }else if ([relation isEqualToString:@"lessThanOrEqual"]){
+        relationStr = @"lessThanOrEqualTo";
+        if (reverse) {
+            relationStr = @"greaterThanOrEqualTo";
+        }
+    }
+    
+    return relationStr;
+}
+/**创建约束代码*/
++ (NSString *)get1CreatConstraintCodeWithIdStr:(NSString *)idStr WithViewName:(NSString *)viewName withConstraintDic:(NSDictionary *)constraintDic withSelfConstraintDic:(NSDictionary *)selfConstraintDic withOutletView:(NSDictionary *)outletView isCell:(BOOL)isCell withCustomAndNameDic:(NSDictionary *)customAndNameDic addToFatherView:(NSString *)fatherView isOnlyTableViewOrCollectionView:(BOOL)isOnlyTableViewOrCollectionView withIdAndOutletViewsDic:(NSDictionary *)idAndOutletViews{
+    
+    NSMutableString *textCode=[NSMutableString string];
+    BOOL hasFDCheck  = NO;
+    
+    [textCode appendFormat:@"[self.%@ mas_makeConstraints:^(MASConstraintMaker *make) {\n",viewName];
+    
+    NSArray *constraintArr=constraintDic[viewName];
+    if (constraintArr.count>0) {
+        for (NSDictionary *constraintSubDic in constraintArr) {
+            
+            //            NSLog(@"%@:%@",viewName,constraintSubDic);
+            
+            //每一个具体的约束
+            
+            NSString *firstAttribute=constraintSubDic[@"firstAttribute"];
+            NSString *firstItem=constraintSubDic[@"firstItem"];
+            NSString *secondAttribute=constraintSubDic[@"secondAttribute"];
+            NSString *secondItem=constraintSubDic[@"secondItem"];
+            NSString *multiplier=constraintSubDic[@"multiplier"];
+            NSString *constant=constraintSubDic[@"constant"];
+            NSString *idStr=constraintSubDic[@"id"];
+            NSString *relation = @"";
+            if ([constraintSubDic containsObjectForKey:@"relation"]) {
+                relation = [constraintSubDic objectForKey:@"relation"];
+            }
+            NSString *priority = @"";
+            if ([constraintSubDic containsObjectForKey:@"priority"]) {
+                priority = [constraintSubDic objectForKey:@"priority"];
+            }
+            
+            NSString *isFd = @"";
+            NSString *checkoutProperty = [NSString stringWithFormat:@"isShow%@",[ZHNSString upFirstCharacter:viewName]];
+            if ([constraintSubDic containsObjectForKey:@"isFD"]) {
+                isFd = [constraintSubDic objectForKey:@"isFD"];
+                // isShowRecommend?34:0
+                constant = [NSString stringWithFormat:@"%@?%@:0",checkoutProperty,constant];
+                if (!hasFDCheck) {
+                    hasFDCheck = YES;
+                    //BOOL isShowRecommend = (self.cellEntity.recommendReason.length > 0);
+                    NSString *checkStr = [NSString stringWithFormat:@"BOOL %@ = (self.<#viewModel#>.<#对应属性#>.length > 0);\n",checkoutProperty];
+                    textCode = [NSMutableString stringWithFormat:@"%@%@",checkStr,textCode];
+                }
+            }
+            
+            if ([firstItem hasPrefix:@"self.view"]) {
+                firstItem=@"self.view";
+            }
+            if ([secondItem hasPrefix:@"self.view"]) {
+                secondItem=@"self.view";
+            }
+            
+            if ([firstItem hasSuffix:@"CollectionViewCell"]||[firstItem hasSuffix:@"TableViewCell"]) {
+                firstItem=@"self.contentView";
+            }
+            if ([secondItem hasSuffix:@"CollectionViewCell"]||[secondItem hasSuffix:@"TableViewCell"]) {
+                secondItem=@"self.contentView";
+            }
+            
+            if([self isSystemIdStr:firstItem]){
+                if (isCell) {
+                    firstItem=@"self.contentView";
+                }else{
+                    firstItem=fatherView;
+                }
+            }
+            
+            if([self isSystemIdStr:secondItem]){
+                if (isCell) {
+                    secondItem=@"self.contentView";
+                }else{
+                    secondItem=fatherView;
+                }
+            }
+            
+            //1.如果该约束的第一对象是自己
+            if ([firstItem isEqualToString:viewName]) {
+                
+                if (secondItem.length>0) {//第2对象存在
+                    
+                    if(secondAttribute.length>0){
+                        if ([secondItem hasPrefix:@"self."]) {
+                            if(constant.length>0){
+                                if ([firstAttribute isEqualToString:@"trailing"]||[firstAttribute isEqualToString:@"bottom"]) {
+                                    relation = [self checkRelation:relation reverse:YES];
+                                    constant=[@"-" stringByAppendingString:constant];
+                                }
+                                NSString *action = @"equalTo";
+                                if (relation.length > 0) {
+                                    action = relation;
+                                }
+                                [textCode appendFormat:@"make.%@.%@(%@.mas_%@).with.offset(%@)",firstAttribute,action,secondItem,firstAttribute,constant];
+                            }else{
+                                [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@)",firstAttribute,secondItem,firstAttribute];
+                            }
+                        }else{
+                            if(constant.length>0){
+                                if (([firstAttribute isEqualToString:@"trailing"]||[firstAttribute isEqualToString:@"bottom"])&&[firstAttribute isEqualToString:secondAttribute]) {
+                                    relation = [self checkRelation:relation reverse:YES];
+                                    constant=[@"-" stringByAppendingString:constant];
+                                }
+                                NSString *action = @"equalTo";
+                                if (relation.length > 0) {
+                                    action = relation;
+                                }
+                                [textCode appendFormat:@"make.%@.%@(self.%@.mas_%@).with.offset(%@)",firstAttribute,action,secondItem,secondAttribute,constant];
+                            }else{
+                                [textCode appendFormat:@"make.%@.equalTo(self.%@.mas_%@)",firstAttribute,secondItem,secondAttribute];
+                            }
+                        }
+                        
+                    }else{
+                        NSLog(@"%@",@"约束很奇怪  有secondItem 没有 secondAttribute");
+                    }
+                    
+                }else{//第2对象不存在
+                    if(constant.length>0){
+                        [textCode appendFormat:@"make.%@.equalTo(@(%@))",firstAttribute,constant];
+                    }else{
+                        NSLog(@"%@",@"约束很奇怪  宽高没有值");
+                    }
+                }
+                
+            }
+            else if ([secondItem isEqualToString:viewName]){
+                
+                if (firstItem.length>0&&[self isSystemIdStr:firstItem]==NO) {
+                    if(firstAttribute.length>0){
+                        
+                        if ([firstItem hasPrefix:@"self."]) {
+                            if(constant.length>0){
+                                if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+                                    relation = [self checkRelation:relation reverse:YES];
+                                    constant=[@"-" stringByAppendingString:constant];
+                                }
+                                NSString *action = @"equalTo";
+                                if (relation.length > 0) {
+                                    action = relation;
+                                }
+                                [textCode appendFormat:@"make.%@.%@(%@.mas_%@).with.offset(%@)",secondAttribute,action,firstItem,secondAttribute,constant];
+                            }else{
+                                [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@)",secondAttribute,firstItem,secondAttribute];
+                            }
+                        }else{
+                            if(constant.length>0){
+                                if (([firstAttribute isEqualToString:@"trailing"]||[firstAttribute isEqualToString:@"bottom"])&&[firstAttribute isEqualToString:secondAttribute]) {
+                                    relation = [self checkRelation:relation reverse:YES];
+                                    constant=[@"-" stringByAppendingString:constant];
+                                }
+                                NSString *action = @"equalTo";
+                                if (relation.length > 0) {
+                                    action = relation;
+                                }
+                                [textCode appendFormat:@"make.%@.%@(self.%@.mas_%@).with.offset(%@)",secondAttribute,action,firstItem,firstAttribute,constant];
+                            }else{
+                                [textCode appendFormat:@"make.%@.equalTo(self.%@.mas_%@)",secondAttribute,firstItem,firstAttribute];
+                            }
+                        }
+                        
+                    }else{
+                        NSLog(@"%@",@"约束很奇怪  有firstItem 没有 firstAttribute");
+                    }
+                }else{
+                    if (selfConstraintDic[viewName]!=nil) {
+                        BOOL isSelfConstraint=NO;
+                        for (NSDictionary *dicTemp in selfConstraintDic[viewName]) {
+                            if([dicTemp[@"id"] isEqualToString:idStr]){
+                                isSelfConstraint=YES;
+                                break;
+                            }
+                        }
+                        if (isSelfConstraint==YES) {
+                            if (firstItem.length<=0) {
+                                if (isCell) {
+                                    firstItem=viewName;
+                                }else{
+                                    firstItem=fatherView;
+                                }
+                            }
+                            if(constant.length>0){
+                                if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+                                    relation = [self checkRelation:relation reverse:YES];
+                                    constant=[@"-" stringByAppendingString:constant];
+                                }
+                                NSString *action = @"equalTo";
+                                if (relation.length > 0) {
+                                    action = relation;
+                                }
+                                [textCode appendFormat:@"make.%@.%@(%@.mas_%@).with.offset(%@)",secondAttribute,action,firstItem,firstAttribute,constant];
+                            }else{
+                                [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@)",secondAttribute,firstItem,firstAttribute];
+                            }
+                        }else{
+                            if (firstItem.length<=0) {
+                                if (firstAttribute.length>0&&secondAttribute.length>0) {
+                                    firstItem=fatherView;
+                                }else{
+                                    if (isCell) {
+                                        firstItem=@"self.contentView";
+                                    }else{
+                                        firstItem=@"self.view";
+                                    }
+                                }
+                            }
+                            if(constant.length>0){
+                                if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+                                    relation = [self checkRelation:relation reverse:YES];
+                                    constant=[@"-" stringByAppendingString:constant];
+                                }
+                                NSString *action = @"equalTo";
+                                if (relation.length > 0) {
+                                    action = relation;
+                                }
+                                [textCode appendFormat:@"make.%@.%@(%@.mas_%@).with.offset(%@)",secondAttribute,action,firstItem,secondAttribute,constant];
+                            }else{
+                                [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@)",secondAttribute,firstItem,secondAttribute];
+                            }
+                        }
+                    }else{
+                        if (firstItem.length<=0) {
+                            if (firstAttribute.length>0&&secondAttribute.length>0) {
+                                firstItem=fatherView;
+                            }else{
+                                if (isCell) {
+                                    firstItem=@"self.contentView";
+                                }else{
+                                    firstItem=@"self.view";
+                                }
+                            }
+                        }
+                        if(constant.length>0){
+                            if ([secondAttribute isEqualToString:@"trailing"]||[secondAttribute hasPrefix:@"bottom"]) {
+                                relation = [self checkRelation:relation reverse:YES];
+                                constant=[@"-" stringByAppendingString:constant];
+                            }
+                            NSString *action = @"equalTo";
+                            if (relation.length > 0) {
+                                action = relation;
+                            }
+                            [textCode appendFormat:@"make.%@.%@(%@.mas_%@).with.offset(%@)",secondAttribute,action,firstItem,secondAttribute,constant];
+                        }else{
+                            [textCode appendFormat:@"make.%@.equalTo(%@.mas_%@)",secondAttribute,firstItem,secondAttribute];
+                        }
+                    }
+                }
+                
+            }
+            else{
+                if (firstAttribute.length>0) {
+                    [textCode appendFormat:@"make.%@.equalTo(@(%@))",firstAttribute,constant];
+                }else{
+                    NSLog(@"%@",@"约束很奇怪  没有firstAttribute");
+                }
+            }
+            if(multiplier.length>0&&[multiplier isEqualToString:@"1"]==NO){
+                [textCode appendFormat:@".multipliedBy(%@)",multiplier];
+            }
+            
+            if (priority.length > 0) {
+                [textCode appendFormat:@".priority(%@)",priority];
+            }
+            [textCode appendString:@";\n"];
+        }
+    }
+    
+    
+    [textCode appendString:@"}];\n\n"];
+    
+    //解决multipliedBy(m:n)的问题
+    [self dealWith_multipliedBy:textCode];
+    //解决.offset(--n)的问题
+    [self dealWith_offset:textCode];
+    return textCode;
+}
+
+//**获取创建某个view的代码*/
++ (NSString *)getCreateViewGetterCodeWithIdStr:(NSString *)idStr WithViewName:(NSString *)viewName withViewCategoryName:(NSString *)viewCategoryName withOutletView:(NSDictionary *)outletView addToFatherView:(NSString *)fatherView isOnlyTableViewOrCollectionView:(BOOL)isOnlyTableViewOrCollectionView withIdAndOutletViewsDic:(NSDictionary *)idAndOutletViews{
+    
+    NSMutableString *textCode=[NSMutableString string];
+    
+    if ([viewName hasPrefix:@"self."]) {
+        return @"";
+    }
+    if ([viewCategoryName isEqualToString:@"UIButton"]) {
+        [textCode appendFormat:@"- (UIButton *)%@{\n",viewName];
+        [textCode appendFormat:@"if (!_%@){\n",viewName];
+        [textCode appendFormat:@"_%@=[UIButton buttonWithType:(UIButtonTypeCustom)];\n",viewName];
+    }else if([viewCategoryName isEqualToString:@"UITableView"]){
+        [textCode appendFormat:@"- (UITableView *)%@{\n",viewName];
+        [textCode appendFormat:@"if (!_%@){\n",viewName];
+        [textCode appendFormat:@"_%@=[[UITableView alloc]initWithFrame:CGRectZero style:(UITableViewStylePlain)];\n",viewName];
+    }else if([viewCategoryName isEqualToString:@"UICollectionView"]){
+        [textCode appendFormat:@"- (UICollectionView *)%@{\n",viewName];
+        [textCode appendFormat:@"if (!_%@){\n",viewName];
+        [textCode appendFormat:@"UICollectionViewFlowLayout *flow%@ = [UICollectionViewFlowLayout new];\n",[self upFirstCharacter:viewName]];
+        [textCode appendFormat:@"//flow%@.scrollDirection = UICollectionViewScrollDirectionHorizontal;//水平\n\
+         flow%@.scrollDirection = UICollectionViewScrollDirectionVertical;//垂直\n\
+         flow%@.minimumInteritemSpacing = 0;\n\
+         flow%@.minimumLineSpacing = 0;\n\n",[self upFirstCharacter:viewName],[self upFirstCharacter:viewName],[self upFirstCharacter:viewName],[self upFirstCharacter:viewName]];
+        [textCode appendFormat:@"_%@=[[UICollectionView alloc]initWithFrame:CGRectZero collectionViewLayout:flow%@];\n",viewName,[self upFirstCharacter:viewName]];
+        [textCode appendFormat:@"%@.backgroundColor=[UIColor whiteColor];\n\
+         //%@.contentInset=UIEdgeInsetsMake(10, 10, 10, 10);\n",viewName,viewName];
+    }else{
+        [textCode appendFormat:@"- (%@ *)%@{\n",viewCategoryName,viewName];
+        [textCode appendFormat:@"if (!_%@){\n",viewName];
+        [textCode appendFormat:@"_%@=[%@ new];\n",viewName,viewCategoryName];
+    }
+    
+    return textCode;
 }
 @end

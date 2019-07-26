@@ -424,7 +424,7 @@
                 for (NSString *idStr in views) {
                     
                     //在这里,获取控件自身的所有约束 比如宽度和高度之类 和关联对象的所有约束
-                    [ZHStoryboardXMLManager getViewAllConstraintWithControllerDic:dic andXMLHandel:xml withViewIdStr:idStr withSelfConstraintDicM:viewConstraintDicM_Self withOtherConstraintDicM:viewConstraintDicM_Other];
+                    [ZHStoryboardXMLManager getViewAllConstraintWithControllerDic:dic andXMLHandel:xml withViewIdStr:self.customAndId[idStr] withSelfConstraintDicM:viewConstraintDicM_Self withOtherConstraintDicM:viewConstraintDicM_Other];
                     
                     //这里获取的属性不包括特殊控件,比如tableView,collectionView
                     NSString *property=[ZHStoryboardTextManager getPropertyWithViewName_XIB:self.customAndId[idStr] withViewCategory:self.customAndName[idStr] isOnlyTableViewOrCollectionView:isOnlyTableViewOrCollectionView];
@@ -455,38 +455,58 @@
                 
                 //1.首先开始创建控件  从父亲的subViews开始
                 NSMutableString *creatCodeStrM=[NSMutableString string];
-                [creatCodeStrM appendString:@"- (void)addSubViews{\n\n"];
+                NSMutableString *addSubViewsStrM=[NSMutableString string];
+                [addSubViewsStrM appendString:@"- (void)addSubViews{\n\n"];
+                NSMutableString *laytouStrM=[NSMutableString string];
+                [laytouStrM appendString:@"- (void)layout{\n\n"];
+                NSMutableString *getterStrM=[NSMutableString string];
+                [getterStrM appendString:@"#pragma mark - setter getter\n"];
+                
                 for (NSString *idStr in views) {
                     NSString *fatherView=[ZHStoryboardTextManager getFatherView:self.customAndId[idStr] inViewRelationShipDic:viewRelationShipDic];
-                    NSString *creatCode=[ZHStoryboardTextManager getCreateViewCodeWithIdStr:idStr WithViewName:self.customAndId[idStr] withViewCategoryName:self.customAndName[idStr] withOutletView:nil addToFatherView:fatherView withDoneArrM:brotherOrderArrM isOnlyTableViewOrCollectionView:YES withIdAndOutletViewsDic:nil];
+                    // addSubViews
+                    NSString *addSubviewStr = [ZHStoryboardTextManager getAddSubviewWithViewName:self.customAndId[idStr] addToFatherView:fatherView];
+                    [addSubViewsStrM appendString:addSubviewStr];
                     
-                    NSMutableString *propertyCode=[NSMutableString string];
-                    [propertyCode setString:creatCode];
-                    
-                    [ZHStoryboardPropertyManager getCodePropertysForViewName:idStr WithidAndViewDic:self.customAndId withCustomAndName:self.customAndName withProperty:self.idAndViewPropertys[idStr] toCodeText:propertyCode];
-                    
-                    [creatCodeStrM appendString:propertyCode];
-                    
+                    // 创建约束
                     NSMutableDictionary *originalConstraintDicM_Self=[NSMutableDictionary dictionary];
                     [ZHStoryboardXMLManager getViewAllConstraintWithViewDic:self.idAndViews[idStr] andXMLHandel:xml withViewIdStr:idStr withSelfConstraintDicM:originalConstraintDicM_Self];
-                    
-                    //创建约束
-                    NSString *constraintCode=[ZHStoryboardTextManager getCreatConstraintCodeWithIdStr:idStr WithViewName:self.customAndId[idStr] withConstraintDic:viewConstraintDicM_Self_NEW withSelfConstraintDic:originalConstraintDicM_Self withOutletView:nil isCell:NO withDoneArrM:brotherOrderArrM withCustomAndNameDic:self.customAndName addToFatherView:fatherView isOnlyTableViewOrCollectionView:isOnlyTableViewOrCollectionView withIdAndOutletViewsDic:nil];
+
+                    NSString *constraintCode=[ZHStoryboardTextManager get1CreatConstraintCodeWithIdStr:idStr WithViewName:self.customAndId[idStr] withConstraintDic:viewConstraintDicM_Self_NEW withSelfConstraintDic:originalConstraintDicM_Self withOutletView:nil isCell:NO withCustomAndNameDic:self.customAndName addToFatherView:fatherView isOnlyTableViewOrCollectionView:isOnlyTableViewOrCollectionView withIdAndOutletViewsDic:nil];
                     
                     //有时我们在StroyBoard或者xib中忘记添加约束,这是就用默认的frame作为约束
                     if([constraintCode rangeOfString:@".equalTo"].location==NSNotFound&&[constraintCode rangeOfString:@"make."].location==NSNotFound){
                         NSString *constraintCodeDefualt=[ZHStoryboardPropertyManager getConstraintIfNotGiveConstraintsForViewName:idStr withProperty:self.idAndViewPropertys[idStr] withFatherView:fatherView];
                         constraintCode = [constraintCode stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"[%@ mas_makeConstraints:^(MASConstraintMaker *make) {\n",idStr] withString:@""];
-                        constraintCode = [constraintCode stringByReplacingOccurrencesOfString:@"}];\n\n\n" withString:@""];
+                        constraintCode = [constraintCode stringByReplacingOccurrencesOfString:@"}];\n\n" withString:@""];
                         constraintCode = [constraintCode stringByAppendingString:constraintCodeDefualt];
                         constraintCode = [constraintCode stringByAppendingString:@"\n\n"];
                     }
                     
-                    [creatCodeStrM appendString:constraintCode];
+                    [laytouStrM appendString:constraintCode];
+                    
+                    // 添加getter
+                    NSString *getter = [ZHStoryboardTextManager getCreateViewGetterCodeWithIdStr:idStr WithViewName:self.customAndId[idStr] withViewCategoryName:self.customAndName[idStr] withOutletView:nil addToFatherView:fatherView isOnlyTableViewOrCollectionView:YES withIdAndOutletViewsDic:nil];
+                    
+                    NSMutableString *getterCode=[NSMutableString string];
+                    [getterCode setString:getter];
+                    
+                    [ZHStoryboardPropertyManager getCodePropertysForViewName:[NSString stringWithFormat:@"%@",idStr] WithidAndViewDic:self.customAndId withCustomAndName:self.customAndName withProperty:self.idAndViewPropertys[idStr] toCodeText:getterCode];
+                    
+                    [getterCode appendString:@"}\n"];
+                    [getterCode appendFormat:@"return _%@;\n",self.customAndId[idStr]];
+                    [getterCode appendString:@"}\n\n"];
+                    [getterStrM appendString:getterCode];
                 }
+                
+                [addSubViewsStrM appendString:@"}\n\n"];
+                [laytouStrM appendString:@"}\n\n"];
+                
+                [creatCodeStrM appendString:addSubViewsStrM];
+                [creatCodeStrM appendString:laytouStrM];
+                [creatCodeStrM appendString:getterStrM];
 //                //解决self.tableView3=tableView3;的问题
                 [ZHStoryboardTextManager dealWith_self_tableView_collectionView:creatCodeStrM isOnlyTableViewOrCollectionView:isOnlyTableViewOrCollectionView];
-                [creatCodeStrM appendString:@"}\n"];
                 
                 //对creatCodeStrM进行替换
                 NSString *creatCodeStrM_new=[creatCodeStrM stringByReplacingOccurrencesOfString:viewController withString:@"self"];

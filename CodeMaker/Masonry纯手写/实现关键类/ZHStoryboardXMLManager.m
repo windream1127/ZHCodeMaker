@@ -1,5 +1,5 @@
 #import "ZHStoryboardXMLManager.h"
-
+#import "ZHNSString.h"
 
 @implementation ZHStoryboardXMLManager
 
@@ -355,7 +355,7 @@
     NSMutableDictionary *dicM=[NSMutableDictionary dictionary];
     
     for (NSDictionary *dic in arrM) {
-        NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+        NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
         
         
         NSMutableArray *allDic=[NSMutableArray array];
@@ -376,8 +376,8 @@
     }
     
     for (NSDictionary *subDic in [xml childDic:tempDic]) {
-        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"customClass" ForDic:subDic]]) {
-            NSString *idStr=[xml dicNodeValueWithKey:@"id" ForDic:subDic];
+        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic]]) {
+            NSString *idStr=[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic];
             [dicM setValue:subDic forKey:idStr];
         }
         //对每一个子view进行获取
@@ -413,7 +413,7 @@
     NSMutableDictionary *dicM=[NSMutableDictionary dictionary];
     
     for (NSDictionary *dic in arrM) {
-        NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+        NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
         
         NSMutableArray *allDic=[NSMutableArray array];
         [xml getDicArrFormPathArr:@[@"subviews"] withIndex:0 withDic:tempDic addToArrM:allDic];
@@ -433,10 +433,10 @@
     }
     
     for (NSDictionary *subDic in [xml childDic:tempDic]) {
-        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"customClass" ForDic:subDic]]) {
+        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic]]) {
             NSString *idStr=[xml dicNodeValueWithKey:@"id" ForDic:subDic];
-            NSString *custom=[xml dicNodeValueWithKey:@"customClass" ForDic:subDic];
-            [dicM setValue:custom forKey:idStr];
+            NSString *custom=[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic];
+            [dicM setValue:idStr forKey:custom];
         }
         //对每一个子view进行获取
         NSMutableArray *allDic=[NSMutableArray array];
@@ -453,7 +453,7 @@
     NSMutableDictionary *dicM=[NSMutableDictionary dictionary];
     
     for (NSDictionary *dic in arrM) {
-        NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+        NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
         
         
         NSMutableArray *allDic=[NSMutableArray array];
@@ -472,7 +472,7 @@
     NSMutableDictionary *dicM=[NSMutableDictionary dictionary];
     
     for (NSDictionary *dic in arrM) {
-        NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+        NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
         
         
         NSMutableArray *allDic=[NSMutableArray array];
@@ -493,9 +493,15 @@
     }
     
     for (NSDictionary *subDic in [xml childDic:tempDic]) {
-        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"customClass" ForDic:subDic]]) {
-            NSString *idStr=[xml dicNodeValueWithKey:@"id" ForDic:subDic];
+        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic]]) {
+            NSString *idStr=[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic];
             NSString *name=[xml dicNodeName:subDic];
+            //第一个字母大写
+            name=[ZHNSString upFirstCharacter:name];
+            name = [NSString stringWithFormat:@"UI%@",name];
+            if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"customClass" ForDic:subDic]]) {
+                name = [xml dicNodeValueWithKey:@"customClass" ForDic:subDic];
+            }
             [dicM setValue:name forKey:idStr];
         }
         //对每一个子view进行获取
@@ -545,7 +551,7 @@
     
     NSMutableArray *ArrM=[NSMutableArray array];
     
-    NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+    NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
     
     
     NSMutableArray *allDic=[NSMutableArray array];
@@ -566,8 +572,8 @@
     }
     
     for (NSDictionary *subDic in [xml childDic:tempDic]) {
-        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"customClass" ForDic:subDic]]) {
-            NSString *idStr=[xml dicNodeValueWithKey:@"id" ForDic:subDic];
+        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic]]) {
+            NSString *idStr=[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic];
             if ([arrM containsObject:idStr]==NO) {
                 [arrM addObject:idStr];
             }
@@ -642,11 +648,11 @@
     }
     
     //找到具体控件的位置
-    NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+    NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
     
     NSMutableArray *allConstraints=[NSMutableArray array];
     //找到对应的节点 根据CustomClass找到的节点 如果CustomClass,就找id  因为有一个特殊的view 就是self.view
-    [xml getTargetNodeArrWithKeyName:@"customClass" andKeyValue:viewIdStr withDic:tempDic withArrM:allConstraints];
+    [xml getTargetNodeArrWithKeyName:@"userLabel" andKeyValue:viewIdStr withDic:tempDic withArrM:allConstraints];
     
     //开始抽取其中的约束值
     for (NSDictionary *dicConstraint in allConstraints) {//其实就只有一个,因为custom唯一
@@ -686,11 +692,11 @@
     [self getViewAllCanotUseConstraintWithControllerDic:dic andXMLHandel:xml withViewIdStr:viewIdStr withCanoyUseConstraintArrM:CanoyUseConstraintArrM];
     
     //找到具体控件的位置
-    NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+    NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
     
     NSMutableArray *allConstraints=[NSMutableArray array];
     //找到对应的节点 根据CustomClass找到的节点 如果CustomClass,就找id  因为有一个特殊的view 就是self.view
-    [xml getTargetNodeArrWithKeyName:@"customClass" andKeyValue:viewIdStr withDic:tempDic withArrM:allConstraints];
+    [xml getTargetNodeArrWithKeyName:@"id" andKeyValue:viewIdStr withDic:tempDic withArrM:allConstraints];
     
     //开始抽取其中的约束值
     for (NSDictionary *dicConstraint in allConstraints) {//其实就只有一个,因为custom唯一
@@ -746,7 +752,7 @@
     [self getViewAllCanotUseConstraintWithControllerDic:dic andXMLHandel:xml withViewIdStr:viewIdStr withCanoyUseConstraintArrM:CanoyUseConstraintArrM];
     
     //找到具体控件的位置
-    NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+    NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
     
     NSMutableArray *arrMSub=[NSMutableArray array];
     [xml getTargetNodeArrWithName:@"constraints" withDic:tempDic withArrM:arrMSub notContain:@[@"tableViewCell",@"collectionViewCell",@"subviews",@"constraints"] withSuccess:NO];
@@ -890,6 +896,7 @@
 
 + (void)reAdjustViewAllConstraintWithNewSelfConstraintDicM_Three:(NSMutableDictionary *)newSelfConstraintDicM withNewOtherConstraintDicM:(NSMutableDictionary *)newOtherConstraintDicM withXMLHandel:(ReadXML *)xml{
     
+    
     for (NSString *view in newOtherConstraintDicM) {
         NSMutableArray *arrTemp=newOtherConstraintDicM[view];
         if (arrTemp.count>0) {
@@ -944,7 +951,7 @@
         relationShipDicM=[NSMutableDictionary dictionary];
     }
     
-    NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+    NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
     //以self.view为最大的父亲 找到的子view 不包括嵌套
     NSMutableArray *arrMSubViews=[NSMutableArray array];
     
@@ -960,13 +967,14 @@
             NSString *dicName=[xml dicNodeName:subDic];
             if ([self isView:dicName].length>0) {
                 
-                NSString *customClass=[xml dicNodeValueWithKey:@"customClass" ForDic:subDic];
+                NSString *customClass=[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic];
                 
                 if (customClass.length>0&&[views containsObject:customClass]) {
                     [views removeObject:customClass];
-                    [subViewNames addObject:customClass];
+                    NSString *idStr =[xml dicNodeValueWithKey:@"id" ForDic:subDic];
+                    [subViewNames addObject:idStr];
                     
-                    [self recursiveCreateRelationShipWithDic:subDic andXMLHandel:xml WithViews:views withRelationShipDic:relationShipDicM withFatherViewName:customClass];
+                    [self recursiveCreateRelationShipWithDic:subDic andXMLHandel:xml WithViews:views withRelationShipDic:relationShipDicM withFatherViewName:idStr];
                 }
             }
         }
@@ -997,14 +1005,14 @@
         for (NSDictionary *subDic in subViews) {
             NSString *dicName=[xml dicNodeName:subDic];
             if ([self isView:dicName].length>0) {
-                
-                NSString *customClass=[xml dicNodeValueWithKey:@"customClass" ForDic:subDic];
-                
+                \
+                NSString *customClass=[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic];
                 if (customClass.length>0&&[views containsObject:customClass]) {
                     [views removeObject:customClass];
-                    [subViewNames addObject:customClass];
+                    NSString *idStr =[xml dicNodeValueWithKey:@"id" ForDic:subDic];
+                    [subViewNames addObject:idStr];
                     
-                    [self recursiveCreateRelationShipWithDic:subDic andXMLHandel:xml WithViews:views withRelationShipDic:relationShipDicM withFatherViewName:customClass];
+                    [self recursiveCreateRelationShipWithDic:subDic andXMLHandel:xml WithViews:views withRelationShipDic:relationShipDicM withFatherViewName:idStr];
                 }
             }
         }
@@ -1167,4 +1175,5 @@
     [xml getTargetNodeArrWithName:@"exclude" withDic:tempDic withArrM:arrM];
     return arrM;
 }
+
 @end

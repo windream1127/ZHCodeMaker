@@ -388,7 +388,6 @@
 		198FAB551F42D4800063BE6B /* DrawUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 198FAB541F42D4800063BE6B /* DrawUIViewController.m */; };
 		198FAB5C1F42F8730063BE6B /* SCLayoutControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 198FAB5B1F42F8730063BE6B /* SCLayoutControl.m */; };
 		198FAB6C1F42F8DB0063BE6B /* SCLazyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 198FAB651F42F8DB0063BE6B /* SCLazyView.m */; };
-		198FAB891F42F9070063BE6B /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 198FAB6F1F42F9070063BE6B /* Info.plist */; };
 		198FAB8A1F42F9070063BE6B /* MASCompositeConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 198FAB711F42F9070063BE6B /* MASCompositeConstraint.m */; };
 		198FAB8B1F42F9070063BE6B /* MASConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 198FAB741F42F9070063BE6B /* MASConstraint.m */; };
 		198FAB8C1F42F9070063BE6B /* MASConstraintMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 198FAB761F42F9070063BE6B /* MASConstraintMaker.m */; };
@@ -1157,7 +1156,6 @@
 		198FAB5B1F42F8730063BE6B /* SCLayoutControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCLayoutControl.m; sourceTree = "<group>"; };
 		198FAB641F42F8DB0063BE6B /* SCLazyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCLazyView.h; sourceTree = "<group>"; };
 		198FAB651F42F8DB0063BE6B /* SCLazyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCLazyView.m; sourceTree = "<group>"; };
-		198FAB6F1F42F9070063BE6B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		198FAB701F42F9070063BE6B /* MASCompositeConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASCompositeConstraint.h; sourceTree = "<group>"; };
 		198FAB711F42F9070063BE6B /* MASCompositeConstraint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASCompositeConstraint.m; sourceTree = "<group>"; };
 		198FAB721F42F9070063BE6B /* MASConstraint+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASConstraint+Private.h"; sourceTree = "<group>"; };
@@ -3626,7 +3624,6 @@
 		198FAB6E1F42F9070063BE6B /* Masonry */ = {
 			isa = PBXGroup;
 			children = (
-				198FAB6F1F42F9070063BE6B /* Info.plist */,
 				198FAB701F42F9070063BE6B /* MASCompositeConstraint.h */,
 				198FAB711F42F9070063BE6B /* MASCompositeConstraint.m */,
 				198FAB721F42F9070063BE6B /* MASConstraint+Private.h */,
@@ -3808,6 +3805,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -3841,7 +3839,6 @@
 				04C7C1411E73F66100E5A2F6 /* moreFunc.jpg in Resources */,
 				04F45EFA1EA1F5C900C11ABD /* uiimageview.png in Resources */,
 				04F1749F1EA8F01000D15AFB /* xuanzhong.png in Resources */,
-				198FAB891F42F9070063BE6B /* Info.plist in Resources */,
 				043A0D6C1EA5E43D00945694 /* switch_icon.png in Resources */,
 				043A0D661EA5E43D00945694 /* progressView_icon.png in Resources */,
 				044419B11E794A6C0025108C /* LaunchScreen.storyboard in Resources */,

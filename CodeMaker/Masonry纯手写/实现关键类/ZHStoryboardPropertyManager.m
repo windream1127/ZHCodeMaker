@@ -6,79 +6,80 @@
     NSMutableDictionary *idAndPropertyDicM=[NSMutableDictionary dictionary];
     for (NSString *viewName in idAndViewDic) {
         [self recursiveGetPropertysForViewName:viewName withViewDic:idAndViewDic[viewName] withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
+        int a = 3;
     }
     return idAndPropertyDicM;
 }
 
 + (void)recursiveGetPropertysForViewName:(NSString *)viewName withViewDic:(NSDictionary *)viewDic withCustomAndName:(NSDictionary *)customAndNameDic toIdAndPropertyDicM:(NSMutableDictionary *)idAndPropertyDicM andXMLHandel:(ReadXML *)xml{
     NSString *categoryView=customAndNameDic[viewName];
-    if ([categoryView isEqualToString:@"label"]) {
+    if ([categoryView isEqualToString:@"UILabel"]) {
         [self setPropertysForLabel:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"button"]) {
+    if ([categoryView isEqualToString:@"UIButton"]) {
         [self setPropertysForButton:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"imageView"]) {
+    if ([categoryView isEqualToString:@"UIImageView"]) {
         [self setPropertysForImageView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"tableView"]) {
+    if ([categoryView isEqualToString:@"UITableView"]) {
         [self setPropertysForTableView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"tableViewCell"]) {
+    if ([categoryView isEqualToString:@"UITableViewCell"]) {
         [self setPropertysForTableViewCell:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"collectionView"]) {
+    if ([categoryView isEqualToString:@"UICollectionView"]) {
         [self setPropertysForCollectionView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"collectionViewCell"]) {
+    if ([categoryView isEqualToString:@"UICollectionViewCell"]) {
         [self setPropertysForCollectionViewCell:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"view"]) {
+    if ([categoryView isEqualToString:@"UIView"]) {
         [self setPropertysForView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"segmentedControl"]) {
+    if ([categoryView isEqualToString:@"UISegmentedControl"]) {
         [self setPropertysForSegmentedControl:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"textField"]) {
+    if ([categoryView isEqualToString:@"UITextField"]) {
         [self setPropertysForTextField:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"switch"]) {
+    if ([categoryView isEqualToString:@"UISwitch"]) {
         [self setPropertysForSwitch:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"activityIndicatorView"]) {
+    if ([categoryView isEqualToString:@"UIactivityIndicatorView"]) {
         [self setPropertysForActivityIndicatorView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"progressView"]) {
+    if ([categoryView isEqualToString:@"UIProgressView"]) {
         [self setPropertysForProgressView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"pageControl"]) {
+    if ([categoryView isEqualToString:@"UIPageControl"]) {
         [self setPropertysForPageControl:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"stepper"]) {
+    if ([categoryView isEqualToString:@"UIStepper"]) {
         [self setPropertysForStepper:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"textView"]) {
+    if ([categoryView isEqualToString:@"UITextView"]) {
         [self setPropertysForTextView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"scrollView"]) {
+    if ([categoryView isEqualToString:@"UIScrollView"]) {
         [self setPropertysForScrollView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"datePicker"]) {
+    if ([categoryView isEqualToString:@"UIDatePicker"]) {
         [self setPropertysForDatePicker:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"pickerView"]) {
+    if ([categoryView isEqualToString:@"UIPickerView"]) {
         [self setPropertysForPickerView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"mapView"]) {
+    if ([categoryView isEqualToString:@"UIMapView"]) {
         [self setPropertysForMapView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"searchBar"]) {
+    if ([categoryView isEqualToString:@"UISearchBar"]) {
         [self setPropertysForSearchBar:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"webView"]) {
+    if ([categoryView isEqualToString:@"UIWebView"]) {
         [self setPropertysForWebView:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
-    if ([categoryView isEqualToString:@"slider"]) {
+    if ([categoryView isEqualToString:@"UISlider"]) {
         [self setPropertysForSlider:viewName withViewDic:viewDic withCustomAndName:customAndNameDic toIdAndPropertyDicM:idAndPropertyDicM andXMLHandel:xml];
     }
     
@@ -295,69 +296,69 @@
 /**根据property属性生成代码*/
 + (void)getCodePropertysForViewName:(NSString *)viewName WithidAndViewDic:(NSDictionary *)idAndViewDic withCustomAndName:(NSDictionary *)customAndNameDic withProperty:(ViewProperty *)property toCodeText:(NSMutableString *)codeText{
     [self recursiveGetPropertysCodeForViewName:viewName withProperty:property withIdAndName:idAndViewDic withCustomAndName:customAndNameDic toCodeText:codeText];
-    [codeText appendString:@"\n"];
+//    [codeText appendString:@"\n"];
 }
 + (void)recursiveGetPropertysCodeForViewName:(NSString *)viewName withProperty:(ViewProperty *)property withIdAndName:(NSDictionary *)idAndNameDic withCustomAndName:(NSDictionary *)customAndNameDic toCodeText:(NSMutableString *)codeText{
     NSString *categoryView=customAndNameDic[viewName];
-    
-    if ([categoryView isEqualToString:@"label"]) {
+    viewName = [NSString stringWithFormat:@"_%@",idAndNameDic[viewName]];
+    if ([categoryView isEqualToString:@"UILabel"]) {
         [self getPropertyCodeForLabel:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"button"]) {
+    if ([categoryView isEqualToString:@"UIButton"]) {
         [self getPropertyCodeForButton:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"imageView"]) {
+    if ([categoryView isEqualToString:@"UIImageView"]) {
         [self getPropertyCodeForImageView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"tableView"]) {
+    if ([categoryView isEqualToString:@"UITableView"]) {
         [self getPropertyCodeForTableView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"collectionView"]) {
+    if ([categoryView isEqualToString:@"UICollectionView"]) {
         [self getPropertyCodeForCollectionView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"view"]) {
+    if ([categoryView isEqualToString:@"UIView"]) {
         [self getPropertyCodeForView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"segmentedControl"]) {
+    if ([categoryView isEqualToString:@"UISegmentedControl"]) {
         [self getPropertyCodeForSegmentedControl:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"textField"]) {
+    if ([categoryView isEqualToString:@"UITextField"]) {
         [self getPropertyCodeForTextField:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"switch"]) {
+    if ([categoryView isEqualToString:@"UISwitch"]) {
         [self getPropertyCodeForSwitch:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"activityIndicatorView"]) {
+    if ([categoryView isEqualToString:@"UIActivityIndicatorView"]) {
         [self getPropertyCodeForActivityIndicatorView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"progressView"]) {
+    if ([categoryView isEqualToString:@"UIProgressView"]) {
         [self getPropertyCodeForProgressView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"pageControl"]) {
+    if ([categoryView isEqualToString:@"UIPageControl"]) {
         [self getPropertyCodeForPageControl:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"stepper"]) {
+    if ([categoryView isEqualToString:@"UIStepper"]) {
         [self getPropertyCodeForStepper:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"textView"]) {
+    if ([categoryView isEqualToString:@"UITextView"]) {
         [self getPropertyCodeForTextView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"scrollView"]) {
+    if ([categoryView isEqualToString:@"UIScrollView"]) {
         [self getPropertyCodeForScrollView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"datePicker"]) {
+    if ([categoryView isEqualToString:@"UIDatePicker"]) {
         [self getPropertyCodeForDatePicker:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"pickerView"]) {
+    if ([categoryView isEqualToString:@"UIPickerView"]) {
         [self getPropertyCodeForPickerView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"mapView"]) {
+    if ([categoryView isEqualToString:@"UIMapView"]) {
         [self getPropertyCodeForMapView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"searchBar"]) {
+    if ([categoryView isEqualToString:@"UISearchBar"]) {
         [self getPropertyCodeForSearchBar:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
-    if ([categoryView isEqualToString:@"webView"]) {
+    if ([categoryView isEqualToString:@"UIWebView"]) {
         [self getPropertyCodeForWebView:viewName withProperty:property withIdAndName:idAndNameDic toCodeText:codeText];
     }
 }

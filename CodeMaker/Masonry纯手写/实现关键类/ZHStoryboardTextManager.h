@@ -94,4 +94,19 @@ typedef NS_ENUM(NSUInteger, ZHAddCodeType) {
 + (NSString *)replaceAllIdByCustomClass:(NSString *)text;
 + (NSString *)detailSpecialCustomClassLikeCell:(NSString *)rowStr;
 + (NSString *)noDetailSpecialCustomClassLikeCell:(NSString *)rowStr;
+
+
+/**
+ addSubview
+ 
+ @param viewName 子属视图
+ @param fatherView 父视图
+ @return 添加代码
+ */
++ (NSString *)getAddSubviewWithViewName:(NSString *)viewName addToFatherView:(NSString *)fatherView;
+/**创建约束代码*/
++ (NSString *)get1CreatConstraintCodeWithIdStr:(NSString *)idStr WithViewName:(NSString *)viewName withConstraintDic:(NSDictionary *)constraintDic withSelfConstraintDic:(NSDictionary *)selfConstraintDic withOutletView:(NSDictionary *)outletView isCell:(BOOL)isCell withCustomAndNameDic:(NSDictionary *)customAndNameDic addToFatherView:(NSString *)fatherView isOnlyTableViewOrCollectionView:(BOOL)isOnlyTableViewOrCollectionView withIdAndOutletViewsDic:(NSDictionary *)idAndOutletViews;
+
+//**获取创建某个view的代码*/
++ (NSString *)getCreateViewGetterCodeWithIdStr:(NSString *)idStr WithViewName:(NSString *)viewName withViewCategoryName:(NSString *)viewCategoryName withOutletView:(NSDictionary *)outletView addToFatherView:(NSString *)fatherView isOnlyTableViewOrCollectionView:(BOOL)isOnlyTableViewOrCollectionView withIdAndOutletViewsDic:(NSDictionary *)idAndOutletViews;
 @end

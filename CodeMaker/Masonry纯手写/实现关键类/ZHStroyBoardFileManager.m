@@ -141,7 +141,7 @@ static NSString *MainDirectory;
 + (void)creatOriginalViewController_h:(NSString *)name isTableView:(BOOL)isTableView isCollectionView:(BOOL)isCollectionView forViewController:(NSString *)viewController{
     NSMutableString *text=[NSMutableString string];
     [self insertValueAndNewlines:@[@"#import <UIKit/UIKit.h>\n"] ToStrM:text];
-    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UIViewController\n",name],@"@end"] ToStrM:text];
+    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UIViewController\n",name],@"@end\n"] ToStrM:text];
     
     [self creatFileWithViewController:viewController name:name text:text isM:NO isModel:NO isView:NO isController:YES];
 }
