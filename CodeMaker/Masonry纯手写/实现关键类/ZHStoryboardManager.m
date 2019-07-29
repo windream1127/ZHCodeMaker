@@ -337,23 +337,25 @@
     
     //    获取所有的View,TableViewCell,CollectionViewCell
     NSArray *allViews=[ZHStoryboardXMLManager getAllViewWithDic:MyDic andXMLHandel:xml];
-    
     //    获取所有的View,TableViewCell,CollectionViewCell名字
     NSArray *views=[ZHStoryboardXMLManager getViewControllerCountNamesWithAllViewControllerArrM:allViews];
     
+    int i = 0;
     for (NSString *view in views) {
+        NSString *classType = [((NSDictionary *)allViews[i]) objectForKey:@"self_Node_Name"];
         //创建MVC文件夹
         [ZHStroyBoardFileManager creat_V_WithViewName_XIB:view];
         //创建对应的View文件
-        [ZHStroyBoardFileManager creat_m_h_file_XIB:view forView:view];
+        [ZHStroyBoardFileManager creat_m_h_file_XIB:view claseType:classType forView:view];
+        i++;
     }
     
     //开始操作所有View
     for (NSDictionary *dic in allViews) {
         
         NSString *viewController;
-        if(dic[@"customClass"]!=nil){
-            viewController=dic[@"customClass"];
+        if(dic[@"userLabel"]!=nil){
+            viewController=dic[@"userLabel"];
             {
                 NSString *viewControllerFileName=[viewController stringByAppendingString:viewController];//对应的ViewController字典key值,通过这个key值可以找到对应存放在字典中的文件内容
                 
@@ -477,7 +479,7 @@
                     //有时我们在StroyBoard或者xib中忘记添加约束,这是就用默认的frame作为约束
                     if([constraintCode rangeOfString:@".equalTo"].location==NSNotFound&&[constraintCode rangeOfString:@"make."].location==NSNotFound){
                         NSString *constraintCodeDefualt=[ZHStoryboardPropertyManager getConstraintIfNotGiveConstraintsForViewName:idStr withProperty:self.idAndViewPropertys[idStr] withFatherView:fatherView];
-                        constraintCode = [constraintCode stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"[%@ mas_makeConstraints:^(MASConstraintMaker *make) {\n",idStr] withString:@""];
+                        constraintCode = [constraintCode stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"[self.%@ mas_makeConstraints:^(MASConstraintMaker *make) {\n",idStr] withString:@""];
                         constraintCode = [constraintCode stringByReplacingOccurrencesOfString:@"}];\n\n" withString:@""];
                         constraintCode = [constraintCode stringByAppendingString:constraintCodeDefualt];
                         constraintCode = [constraintCode stringByAppendingString:@"\n\n"];

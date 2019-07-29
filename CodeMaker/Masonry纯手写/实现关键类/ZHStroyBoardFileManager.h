@@ -17,6 +17,7 @@
 + (NSMutableString *)get_M_ContextByIdentity:(NSString *)identity;
 
 + (void)creat_m_h_file:(NSString *)fileName isModel:(BOOL)isModel isView:(BOOL)isView isController:(BOOL)isController isTableView:(BOOL)isTableView isCollectionView:(BOOL)isCollectionView forViewController:(NSString *)viewController;
++ (void)creat_m_h_file_XIB:(NSString *)fileName claseType:(NSString *)claseType forView:(NSString *)view;
 + (void)creat_m_h_file_XIB:(NSString *)fileName forView:(NSString *)view;
 
 + (NSString *)getAdapterTableViewCellName:(NSString *)name;

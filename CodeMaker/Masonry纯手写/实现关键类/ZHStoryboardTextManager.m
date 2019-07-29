@@ -1997,6 +1997,7 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
                     hasFDCheck = YES;
                     //BOOL isShowRecommend = (self.cellEntity.recommendReason.length > 0);
                     NSString *checkStr = [NSString stringWithFormat:@"BOOL %@ = (self.<#viewModel#>.<#对应属性#>.length > 0);\n",checkoutProperty];
+                    [textCode replaceOccurrencesOfString:@"mas_makeConstraints" withString:@"mas_remakeConstraints" options:(NSLiteralSearch) range:NSMakeRange(0, textCode.length)];
                     textCode = [NSMutableString stringWithFormat:@"%@%@",checkStr,textCode];
                 }
             }

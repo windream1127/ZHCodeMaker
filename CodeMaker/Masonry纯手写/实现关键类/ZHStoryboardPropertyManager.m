@@ -391,7 +391,7 @@
 + (void)getPropertyCodeForImageView:(NSString *)viewName withProperty:(ViewProperty *)property withIdAndName:(NSDictionary *)idAndNameDic toCodeText:(NSMutableString *)codeText{
 //    @"image",@"contentMode"
     [self getPublicPropertyCodeForView:viewName WithProperty:property toCodeText:codeText];
-    if (property.image.length>0)[codeText appendFormat:@"%@.image=[UIImage imageNamed:@\"%@\"];\n",viewName,property.image];
+    if (property.image.length>0)[codeText appendFormat:@"%@.image=[LJSecondHandResource imageNamed:@\"%@\"];\n",viewName,property.image];
     if (property.contentMode.length>0&&[property.contentMode isEqualToString:@"scaleToFill"]==NO)[codeText appendFormat:@"%@.contentMode=UIViewContentMode%@;\n",viewName,[self upFirstCharacter:property.contentMode]];
 }
 + (void)getPropertyCodeForTableView:(NSString *)viewName withProperty:(ViewProperty *)property withIdAndName:(NSDictionary *)idAndNameDic toCodeText:(NSMutableString *)codeText{
@@ -491,7 +491,7 @@
 //    NSLog(@"%@:%@:%@:%@",property.rect_x,property.rect_y,property.rect_w,property.rect_h);
     if (property.rect_x.length>0||property.rect_y.length>0||property.rect_w>0||property.rect_h>0) {
         NSMutableString *rectConstraint=[NSMutableString string];
-        [rectConstraint appendFormat:@"[%@ mas_makeConstraints:^(MASConstraintMaker *make) {\n",viewName];
+        [rectConstraint appendFormat:@"[self.%@ mas_makeConstraints:^(MASConstraintMaker *make) {\n",viewName];
         [rectConstraint appendFormat:@"make.leading.equalTo(%@.mas_leading).with.offset(%@);\n",fatherView,property.rect_x];
         [rectConstraint appendFormat:@"make.top.equalTo(%@.mas_top).with.offset(%@);\n",fatherView,property.rect_y];
         [rectConstraint appendFormat:@"make.width.equalTo(@(%@));\n",property.rect_w];

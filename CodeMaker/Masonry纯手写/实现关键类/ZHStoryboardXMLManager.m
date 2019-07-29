@@ -25,8 +25,8 @@
     NSMutableArray *arrMName=[NSMutableArray array];
     
     for (NSDictionary *dic in arrM) {
-        if(dic[@"customClass"]!=nil)
-           [arrMName addObject:dic[@"customClass"]];
+        if(dic[@"userLabel"]!=nil)
+           [arrMName addObject:dic[@"userLabel"]];
     }
     return arrMName;
 }
@@ -296,7 +296,7 @@
     NSMutableDictionary *dicM=[NSMutableDictionary dictionary];
     
     for (NSDictionary *dic in arrM) {
-        NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+        NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
         
         NSMutableArray *allDic=[NSMutableArray array];
         [xml getDicArrFormPathArr:@[@"view",@"subviews"] withIndex:0 withDic:tempDic addToArrM:allDic];
@@ -317,8 +317,8 @@
     }
     
     for (NSDictionary *subDic in [xml childDic:tempDic]) {
-        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"customClass" ForDic:subDic]]) {
-            NSString *idStr=[xml dicNodeValueWithKey:@"id" ForDic:subDic];
+        if ([xml checkNodeValue:[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic]]) {
+            NSString *idStr=[xml dicNodeValueWithKey:@"userLabel" ForDic:subDic];
             [dicM setValue:subDic forKey:idStr];
         }
         //对每一个子view进行获取
@@ -535,7 +535,7 @@
     
     NSMutableArray *ArrM=[NSMutableArray array];
     
-    NSDictionary *tempDic=[xml getDicWithCondition:@{@"customClass":[xml dicNodeValueWithKey:@"customClass" ForDic:dic]} withDic:dic];
+    NSDictionary *tempDic=[xml getDicWithCondition:@{@"userLabel":[xml dicNodeValueWithKey:@"userLabel" ForDic:dic]} withDic:dic];
     
     NSMutableArray *allDic=[NSMutableArray array];
     [xml getDicArrFormPathArr:@[@"view",@"subviews"] withIndex:0 withDic:tempDic addToArrM:allDic];

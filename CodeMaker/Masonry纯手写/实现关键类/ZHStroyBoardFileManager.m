@@ -82,7 +82,7 @@ static NSString *MainDirectory;
     for (NSString *filePath in [self defalutContextDicM]) {
         NSMutableString *context=[self defalutContextDicM][filePath];
         context=[NSMutableString stringWithString:[[ZHWordWrap new] wordWrapText:context]];
-        [context writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        BOOL error = [context writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     }
     
     MainDirectory=nil;
@@ -108,6 +108,18 @@ static NSString *MainDirectory;
         [self creatOriginalViewController_m:fileName isTableView:isTableView isCollectionView:isCollectionView forViewController:viewController];
     }
 }
+
++ (void)creat_m_h_file_XIB:(NSString *)fileName claseType:(NSString *)claseType forView:(NSString *)view{
+    if (MainDirectory.length<=0) {
+        [self creat_V_WithViewName_XIB:view];
+    }
+    NSString *directory=MainDirectory;
+    directory=[directory stringByAppendingPathComponent:view];
+
+    [self creatOriginalView_h:fileName classType:claseType forViewController:view];
+    [self creatOriginalView_m:fileName classType:claseType forViewController:view];
+}
+
 + (void)creat_m_h_file_XIB:(NSString *)fileName forView:(NSString *)view{
     if (MainDirectory.length<=0) {
         [self creat_V_WithViewName_XIB:view];
@@ -230,11 +242,16 @@ static NSString *MainDirectory;
     }
     [self creatFileWithViewController:viewController name:name text:text isM:YES isModel:YES isView:NO isController:NO];
 }
+
++ (void)creatOriginalView_h:(NSString *)name classType:(NSString *)classType forViewController:(NSString *)viewController{
+    [self creatOriginalView_h:name classType:classType forView:viewController];
+}
+
 + (void)creatOriginalView_h:(NSString *)name isTableView:(BOOL)isTableView isCollectionView:(BOOL)isCollectionView forViewController:(NSString *)viewController{
     if (isTableView) {
         name=[self getAdapterTableViewCellName:name];
         name=[name stringByAppendingString:@"TableViewCell"];
-//        NSLog(@"%@",name);
+        NSLog(@"%@",name);
         [self creatOriginalTableViewCell_h:name forViewController:viewController];
     }else if (isCollectionView){
         name=[self getAdapterCollectionViewCellName:name];
@@ -244,6 +261,11 @@ static NSString *MainDirectory;
         [self creatOriginalView_h:name forView:viewController];
     }
 }
+
++ (void)creatOriginalView_m:(NSString *)name classType:(NSString *)classType forViewController:(NSString *)viewController{
+    [self creatOriginalView_m:name classType:classType forView:viewController];
+}
+
 + (void)creatOriginalView_m:(NSString *)name isTableView:(BOOL)isTableView isCollectionView:(BOOL)isCollectionView forViewController:(NSString *)viewController{
     if (isTableView) {
         name=[self getAdapterTableViewCellName:name];
@@ -262,23 +284,18 @@ static NSString *MainDirectory;
 
     [self insertValueAndNewlines:@[@"#import <UIKit/UIKit.h>\n"] ToStrM:text];
     
-    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UITableViewCell\n",name],@"@end"] ToStrM:text];
+    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UITableViewCell\n",name],@"@end\n"] ToStrM:text];
     
     [self creatFileWithViewController:viewController name:name text:text isM:NO isModel:NO isView:YES isController:NO];
 }
 + (void)creatOriginalTableViewCell_m:(NSString *)name forViewController:(NSString *)viewController{
     NSMutableString *text=[NSMutableString string];
-    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"#import \"%@.h\"\n",name],[NSString stringWithFormat:@"@interface %@ ()\n",name],@"@end",[NSString stringWithFormat:@"@implementation %@",name]] ToStrM:text];
+    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"#import \"%@.h\"\n",name],[NSString stringWithFormat:@"@interface %@ ()\n",name],@"@end\n",[NSString stringWithFormat:@"@implementation %@",name]] ToStrM:text];
     [self insertValueAndNewlines:@[@"- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{\n\
                                    if (self=[super initWithStyle:style reuseIdentifier:reuseIdentifier]) {\n\
                                    [self addSubViews];\n\
                                    }\n\
                                    return self;\n\
-                                   }\n\
-                                   \n\
-                                   - (void)awakeFromNib {\n\
-                                   [super awakeFromNib];\n\
-                                   [self addSubViews];\n\
                                    }\n\
                                    \n\
                                    - (void)setSelected:(BOOL)selected animated:(BOOL)animated {\n\
@@ -292,13 +309,13 @@ static NSString *MainDirectory;
     NSMutableString *text=[NSMutableString string];
     
     [self insertValueAndNewlines:@[@"#import <UIKit/UIKit.h>\n"] ToStrM:text];
-    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UICollectionViewCell\n",name],@"@end"] ToStrM:text];
+    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UICollectionViewCell\n",name],@"@end\n"] ToStrM:text];
     
     [self creatFileWithViewController:viewController name:name text:text isM:NO isModel:NO isView:YES isController:NO];
 }
 + (void)creatOriginalCollectionViewCell_m:(NSString *)name forViewController:(NSString *)viewController{
     NSMutableString *text=[NSMutableString string];
-    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"#import \"%@.h\"\n",name],[NSString stringWithFormat:@"@interface %@ ()\n",name],@"@end",[NSString stringWithFormat:@"@implementation %@\n",name]] ToStrM:text];
+    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"#import \"%@.h\"\n",name],[NSString stringWithFormat:@"@interface %@ ()\n",name],@"@end\n",[NSString stringWithFormat:@"@implementation %@\n",name]] ToStrM:text];
     [self insertValueAndNewlines:@[@"- (instancetype)initWithFrame:(CGRect)frame{\n\
                                    if (self=[super initWithFrame:frame]) {\n\
                                    [self addSubViews];\n\
@@ -322,13 +339,60 @@ static NSString *MainDirectory;
     
     [self creatFileWithViewController_XIB:view name:name text:text isM:NO isModel:NO isView:YES isController:NO];
 }
+
++ (void)creatOriginalView_h:(NSString *)name classType:(NSString *)classType forView:(NSString *)view{
+    NSMutableString *text=[NSMutableString string];
+    
+    [self insertValueAndNewlines:@[@"#import <UIKit/UIKit.h>\n"] ToStrM:text];
+    
+    if ([name hasSuffix:@"TableViewCell"] || [classType isEqualToString:@"tebleViewCell"]) {
+        [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UITableViewCell\n",name],@"@end"] ToStrM:text];
+    }else if([name hasSuffix:@"CollectionViewCell"] || [classType isEqualToString:@"collectionViewCell"]){
+        [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UICollectionViewCell\n",name],@"@end"] ToStrM:text];
+    }else
+        [self insertValueAndNewlines:@[[NSString stringWithFormat:@"@interface %@ : UIView\n",name],@"@end"] ToStrM:text];
+    
+    [self creatFileWithViewController_XIB:view name:name text:text isM:NO isModel:NO isView:YES isController:NO];
+}
+
++ (void)creatOriginalView_m:(NSString *)name classType:(NSString *)classType forView:(NSString *)view{
+    NSMutableString *text=[NSMutableString string];
+    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"#import \"%@.h\"\n",name],[NSString stringWithFormat:@"@interface %@ ()\n",name],@"@end\n",[NSString stringWithFormat:@"@implementation %@\n",name]] ToStrM:text];
+    if ([name hasSuffix:@"TableViewCell"] || [classType isEqualToString:@"tebleViewCell"]) {
+        [self insertValueAndNewlines:@[@"- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{\n\
+                                       if (self=[super initWithStyle:style reuseIdentifier:reuseIdentifier]) {\n\
+                                       [self addSubViews];\n\
+                                       }\n\
+                                       return self;\n\
+                                       }\n\
+                                       \n\
+                                       - (void)setSelected:(BOOL)selected animated:(BOOL)animated {\n\
+                                       [super setSelected:selected animated:animated];\n\
+                                       }\n\
+                                       \n\
+                                       @end"] ToStrM:text];
+    }else if([name hasSuffix:@"CollectionViewCell"] || [classType isEqualToString:@"collectionViewCell"]){
+        [self insertValueAndNewlines:@[@"- (instancetype)initWithFrame:(CGRect)frame{\n\
+                                       if (self=[super initWithFrame:frame]) {\n\
+                                       [self addSubViews];\n\
+                                       }\n\
+                                       return self;\n\
+                                       }\n",@"@end"] ToStrM:text];
+    }else{
+        [self insertValueAndNewlines:@[@"- (instancetype)initWithFrame:(CGRect)frame{\n\
+                                       if (self=[super initWithFrame:frame]) {\n\
+                                       [self addSubViews];\n\
+                                       }\n\
+                                       return self;\n\
+                                       }\n",@"@end"] ToStrM:text];
+    }
+    [self creatFileWithViewController_XIB:view name:name text:text isM:YES isModel:NO isView:YES isController:NO];
+}
+
 + (void)creatOriginalView_m:(NSString *)name forView:(NSString *)view{
     NSMutableString *text=[NSMutableString string];
-    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"#import \"%@.h\"\n",name],[NSString stringWithFormat:@"@interface %@ ()\n",name],@"@end",[NSString stringWithFormat:@"@implementation %@\n",name]] ToStrM:text];
-    [self insertValueAndNewlines:@[@"- (void)awakeFromNib {\n\
-                                   [super awakeFromNib];\n\
-                                   [self addSubViews];\n\
-                                   }\n\n- (instancetype)initWithFrame:(CGRect)frame{\n\
+    [self insertValueAndNewlines:@[[NSString stringWithFormat:@"#import \"%@.h\"\n",name],[NSString stringWithFormat:@"@interface %@ ()\n",name],@"@end\n",[NSString stringWithFormat:@"@implementation %@\n",name]] ToStrM:text];
+    [self insertValueAndNewlines:@[@"- (instancetype)initWithFrame:(CGRect)frame{\n\
                                    if (self=[super initWithFrame:frame]) {\n\
                                    [self addSubViews];\n\
                                    }\n\
