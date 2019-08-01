@@ -270,6 +270,10 @@ static NSMutableDictionary *ZHStoryboardIDDicM;
         for (NSString *fd_collapsibleConstraintsId in FDDic) {
             rowStr=[rowStr stringByReplacingOccurrencesOfString:fd_collapsibleConstraintsId withString:[NSString stringWithFormat:@"fd_collapsibleConstraintsId\" isFD=\"1"]];
         }
+        
+        // <gestureRecognizers/> 处理
+        rowStr=[rowStr stringByReplacingOccurrencesOfString:@"<gestureRecognizers/>" withString:[NSString stringWithFormat:@"<gestureRecognizers />"]];
+        
         [arrM addObject:[self replaceAllIdByCustomClass:rowStr]];
     }
     return [arrM componentsJoinedByString:@"\n"];
