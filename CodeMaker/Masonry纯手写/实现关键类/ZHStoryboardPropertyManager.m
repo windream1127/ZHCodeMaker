@@ -289,6 +289,37 @@
             }
         }
     }
+    
+    // keyPath 目前只关注圆角
+    NSDictionary *userDefinedDic=[xml getOneDegreeChildWithName:@"userDefinedRuntimeAttributes" withDic:viewDic];
+    NSArray *subuserDefinedArr=[xml childDic:userDefinedDic];
+    NSMutableArray *keyPaths = [NSMutableArray new];
+    for (id obj in subuserDefinedArr) {
+        if ([obj isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *subUserDefinedDic=obj;
+            if ([[xml dicNodeName:subUserDefinedDic] isEqualToString:@"userDefinedRuntimeAttribute"]) {
+                keyPathEntity *keypath = [keyPathEntity new];
+                keypath.key_path=[xml getPropertyWithName:@"keyPath" withDic:subUserDefinedDic needInChild:NO];
+                if ([keypath.key_path containsString:@"Color"]) {
+                    NSDictionary *colorDic=[xml getOneDegreeChildWithName:@"color" withDic:subUserDefinedDic];
+                    NSString *color_red=[xml getPropertyWithName:@"red" withDic:colorDic needInChild:NO];
+                    NSString *color_green=[xml getPropertyWithName:@"green" withDic:colorDic needInChild:NO];
+                    NSString *color_blue=[xml getPropertyWithName:@"blue" withDic:colorDic needInChild:NO];
+                    NSString *color_alpha=[xml getPropertyWithName:@"alpha" withDic:colorDic needInChild:NO];
+                    if (color_red.length > 0 || color_blue.length>0 || color_green.length>0) {
+                        keypath.value = [NSString stringWithFormat:@"[UIColor colorWithRed:%@ green:%@ blue:%@ alpha:%@]",[self getThreedigits:color_red],[self getThreedigits:color_green],[self getThreedigits:color_blue],color_alpha];
+                    }
+                }else{
+                    keypath.value=[xml getPropertyWithName:@"value" withDic:subUserDefinedDic needInChild:NO];
+                }
+                
+                if (keypath.value.length > 0) {
+                    [keyPaths addObject:keypath];
+                }
+            }
+        }
+    }
+    property.keypath_list = [keyPaths copy];
 }
 
 
@@ -373,9 +404,7 @@
     if (property.pointSize.length>0&&[property.pointSize isEqualToString:@"17"]==NO) [codeText appendFormat:@"%@.font=[UIFont systemFontOfSize:%@];\n",viewName,property.pointSize];
     
     if (property.textColor_red.length>0||property.textColor_green.length>0||property.textColor_blue.length>0) {
-        if(![property.textColor_red isEqualToString:@"0.0"]&&[property.textColor_green isEqualToString:@"0.0"]&&[property.textColor_blue isEqualToString:@"0.0"]){
             [codeText appendFormat:@"%@.textColor=[UIColor colorWithRed:%@ green:%@ blue:%@ alpha:%@];\n",viewName,[self getThreedigits:property.textColor_red],[self getThreedigits:property.textColor_green],[self getThreedigits:property.textColor_blue],property.textColor_alpha];
-        }
     }
 }
 + (void)getPropertyCodeForButton:(NSString *)viewName withProperty:(ViewProperty *)property withIdAndName:(NSDictionary *)idAndNameDic toCodeText:(NSMutableString *)codeText{
@@ -541,6 +570,24 @@
     //2.action
     if (property.selector.length>0&&property.eventType.length>0) {
         [codeText appendFormat:@"[%@ addTarget:self action:@selector(%@) forControlEvents:UIControlEvent%@];\n",viewName,property.selector,[self upFirstCharacter:property.eventType]];
+    }
+    
+    //3. keyPath 目前只关注圆角
+    if (property.keypath_list.count > 0) {
+        for (keyPathEntity *keyPath in property.keypath_list) {
+            if ([keyPath.key_path isEqualToString:@"layer.cornerRadius"]) {
+                if (keyPath.value.floatValue > 0.001) {
+                    [codeText appendFormat:@"%@.%@ = %@;\n",viewName,keyPath.key_path,keyPath.value];
+                    [codeText appendFormat:@"%@.layer.masksToBounds = YES;\n",viewName];
+                }
+            }else if ([keyPath.key_path isEqualToString:@"layer.borderWidth"]){
+                if (keyPath.value.floatValue > 0.001) {
+                    [codeText appendFormat:@"%@.%@ = %@;\n",viewName,keyPath.key_path,keyPath.value];
+                }
+            }else if ([keyPath.key_path isEqualToString:@"layer.borderColor"]){
+                [codeText appendFormat:@"%@.%@ = %@.CGColor;\n",viewName,keyPath.key_path,keyPath.value];
+            }
+        }
     }
 }
 

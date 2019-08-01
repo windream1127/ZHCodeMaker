@@ -1,5 +1,9 @@
 #import "ViewProperty.h"
 
+@implementation keyPathEntity
+
+@end
+
 @implementation ViewProperty
 - (BOOL)hasProperty:(NSString *)property{
     NSString *propertys=@"_reuseIdentifier_placeholder_on_clearButtonMode_image_pointSize_alpha_contentMode_style_adjustsFontSizeToFit_text_textAlignment_rowHeight_title_type_backgroundImage_selector_eventType_segment_numberOfLines_";

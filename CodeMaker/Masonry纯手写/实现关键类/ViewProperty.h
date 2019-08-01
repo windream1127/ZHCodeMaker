@@ -1,5 +1,12 @@
 #import <UIKit/UIKit.h>
 
+@interface keyPathEntity : NSObject
+
+@property (nonatomic, copy) NSString *key_path;
+@property (nonatomic, copy) NSString *value;
+
+@end
+
 @interface ViewProperty : NSObject
 @property (nonatomic,copy)NSString *rect_x;
 @property (nonatomic,copy)NSString *rect_y;
@@ -42,6 +49,7 @@
 @property (nonatomic,copy)NSString *placeholder;
 
 @property (nonatomic,copy)NSString *reuseIdentifier;
+@property (nonatomic, copy) NSArray<keyPathEntity *> *keypath_list;
 
 - (BOOL)hasProperty:(NSString *)property;
 
